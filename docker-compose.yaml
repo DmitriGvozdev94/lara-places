@@ -6,7 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: laravel-breeze-react-app
     container_name: laravel_breeze_app
     restart: unless-stopped
     working_dir: /var/www

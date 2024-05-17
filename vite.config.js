@@ -3,6 +3,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path'
+import laravel from 'laravel-vite-plugin';
+import dotenv from 'dotenv'
+dotenv.config()
 
 export default defineConfig({
   resolve: {
@@ -10,7 +13,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './resources/js'),
     }
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    laravel([
+      'resources/js/app.jsx',
+    ]),
+  ],
   server: {
     port: 5173, // Ensure this matches the mapped port
     host: '0.0.0.0', // Listen on all interfaces
