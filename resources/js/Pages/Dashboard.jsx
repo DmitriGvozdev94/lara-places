@@ -10,8 +10,10 @@ export default function Dashboard({ auth }) {
     const [latitude, setLatitude] = useState(45.42121997393463);
     const [longitude, setLongitude] = useState(-75.70225556954014);
     const [radius, setRadius] = useState(1000); // Default radius in meters
+    const [numResults, setNumResults] = useState(11);
+    const [tags, setTags] = useState([]); // Default filter is empty
 
-    const { data, loading, error } = useFetchNearbyLocations(latitude, longitude, radius);
+    const { data, loading, error } = useFetchNearbyLocations(latitude, longitude, radius, tags, numResults);
 
     const columns = [
         { field: 'name', headerName: 'Name', width: 300 },
@@ -20,18 +22,20 @@ export default function Dashboard({ auth }) {
     ];
 
     const rows = data.map((item) => ({
-        id: item.id,
-        lat: item.lat,
-        lon: item.lon,
-        type: item.tags.amenity || "Unknown",
-        name: item.tags.name || "Unknown",
-        cuisine: item.tags.cuisine || "Unknown",
+        id: item?._source?.id,
+        lat: item?._source?.lat,
+        lon: item?._source?.lon,
+        type: item?._source?.tags?.amenity || "Unknown",
+        name: item?._source?.tags?.name || "Unknown",
+        cuisine: item?._source?.tags?.cuisine || "Unknown",
     }));
 
     useEffect(() => {
         console.log(latitude, longitude, radius);
 
     }, [latitude, longitude, radius]);
+
+    useEffect(() => {console.log(data)}, [data]);
 
     useEffect(() => {
         if ('geolocation' in navigator) {
@@ -43,7 +47,9 @@ export default function Dashboard({ auth }) {
             console.error('Geolocation is not available');
         }
     }, []);
-
+    const handleTagsChange = (e) => {
+        setTags(e.target.value.split(',').map(tag => tag.trim()));
+    };
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -58,10 +64,28 @@ export default function Dashboard({ auth }) {
                             <div>You're logged in!</div>
                             <label className="block mt-4">Select Radius (in meters):</label>
                             <input
+                            type="number"
+                            defaultValue={radius}
+                            onBlur={(e) => setRadius(e.target.value)}
+                            placeholder="Radius in meters"
+                            className="rounded-md border p-2 mt-1 w-full"
+                            />
+
+                            <label className="block mt-4">Number of Results:</label>
+                            <input
                                 type="number"
-                                value={radius}
-                                onChange={(e) => setRadius(e.target.value)}
-                                placeholder="Radius in meters"
+                                defaultValue={numResults}
+                                onBlur={(e) => setNumResults(e.target.value)}
+                                placeholder="Number of results"
+                                className="rounded-md border p-2 mt-1 w-full"
+                            />
+
+                            <label className="block mt-4">Tags (comma-separated):</label>
+                            <input
+                                type="text"
+                                defaultValue={tags.join(', ')}
+                                onBlur={handleTagsChange}
+                                placeholder="e.g. restaurant, cafe"
                                 className="rounded-md border p-2 mt-1 w-full"
                             />
                             {error && <p className="text-red-500 mt-2">{error}</p>}

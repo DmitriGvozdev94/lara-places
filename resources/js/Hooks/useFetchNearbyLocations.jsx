@@ -1,10 +1,7 @@
-// resources/js/Hooks/useFetchNearbyLocations.jsx
-
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { indexDataToElasticsearch } from '@/Utils/Opensearch';
 
-export default function useFetchNearbyLocations(latitude, longitude, radius) {
+export default function useFetchNearbyLocations(latitude, longitude, radius, tags = [], size = 10) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -14,26 +11,21 @@ export default function useFetchNearbyLocations(latitude, longitude, radius) {
 
         async function fetchData() {
             try {
-                const url = `http://overpass-api.de/api/interpreter`
-                const query = `
-                [out:json];
-                node[amenity=restaurant](around:${radius},${latitude},${longitude});
-                out;
-                `;  
-                const params = new URLSearchParams({ data: query });
-                const response = await fetch(`${url}?${params.toString()}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log(data)
-                    console.log(data.elements)
-                    setData(data.elements || []);
-                    setError(null);
+                const response = await axios.post('/fetch-locations', {
+                    latitude,
+                    longitude,
+                    radius,
+                    tags,
+                    size
+                });
 
-                    indexDataToElasticsearch(data.elements || []);
+                if (response.status === 200) {
+                    setData(response.data);
+                    setError(null);
                 } else {
                     console.error(`Error: ${response.status} - ${response.statusText}`);
+                    setError('Failed to fetch data');
                 }
-
             } catch (err) {
                 console.error('Error fetching locations:', err);
                 setError('Failed to fetch data');
@@ -43,7 +35,7 @@ export default function useFetchNearbyLocations(latitude, longitude, radius) {
         }
 
         fetchData();
-    }, [latitude, longitude, radius]);
+    }, [latitude, longitude, radius, tags, size]);
 
     return { data, loading, error };
 }

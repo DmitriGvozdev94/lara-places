@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LocationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+Route::post('/fetch-locations', [LocationController::class, 'fetchAndIndexLocations']);
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

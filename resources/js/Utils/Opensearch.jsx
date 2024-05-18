@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const ELASTICSEARCH_URL = 'http://192.168.6.69:9200';  // Replace with your actual OpenSearch/Elasticsearch endpoint
+const ELASTICSEARCH_URL = 'http://opensearch:9200';  // Replace with your actual OpenSearch/Elasticsearch endpoint
 const INDEX_NAME = 'places';  // Replace with your desired index name
 /**
  * Index a list of documents into Elasticsearch.
@@ -8,6 +8,7 @@ const INDEX_NAME = 'places';  // Replace with your desired index name
  */
 export async function indexDataToElasticsearch(documents) {
     try {
+        return
         // Ensure the index exists or create it
         await createElasticsearchIndexIfNotExists();
 
