@@ -4,7 +4,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LocationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\IgnoreListController;
 use Inertia\Inertia;
+
+
+Route::middleware('auth:sanctum')->post('/ignore-list', [IgnoreListController::class, 'store']);
 
 Route::post('/fetch-locations', [LocationController::class, 'fetchAndIndexLocations']);
 

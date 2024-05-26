@@ -3,8 +3,27 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { DataGrid } from '@mui/x-data-grid';
+import { IconButton } from '@mui/material';
 import useFetchNearbyLocations from '@/Hooks/useFetchNearbyLocations';
 import { useState, useEffect } from 'react';
+import BlockIcon from '@mui/icons-material/Block';
+
+async function addToIgnore(itemId) {
+    try {
+        const response = await axios.post('/ignore-list', {
+            item_id: itemId,
+        }, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            }});
+            data = response.data
+            return data
+        } 
+    catch (error) {
+        console.error('Error ignoring item:', error);
+        throw `Error ignoring item`
+    }
+} 
 
 export default function Dashboard({ auth }) {
     const [latitude, setLatitude] = useState(45.42121997393463);
@@ -15,10 +34,35 @@ export default function Dashboard({ auth }) {
 
     const { data, loading, error } = useFetchNearbyLocations(latitude, longitude, radius, tags, numResults);
 
+
+
+    const handleAddToIgnore = (e, row) => {
+        e.stopPropagation();
+        console.log(row)
+        addToIgnore(row.id).then((res) => {
+            console.log(res)
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
+    
+
     const columns = [
+        { field: 'actions', headerName: 'Actions', width: 100, renderCell: (params) => {
+            return (
+              <IconButton
+                onClick={(e) => handleAddToIgnore(e, params.row)}
+                variant="contained"
+              >
+                <BlockIcon></BlockIcon>
+              </IconButton>
+            );
+        }},
         { field: 'name', headerName: 'Name', width: 300 },
         { field: 'type', headerName: 'Type', width: 200 },
         { field: 'cuisine', headerName: 'Cuisine', width: 200 },
+
     ];
 
     const rows = data.map((item) => ({
@@ -93,8 +137,7 @@ export default function Dashboard({ auth }) {
                                 <DataGrid
                                     rows={loading ? [] : rows}
                                     columns={columns}
-                                    pageSize={5}
-                                    checkboxSelection
+                                    pageSize={10}
                                     loading={loading}
                                 />
                             </div>
