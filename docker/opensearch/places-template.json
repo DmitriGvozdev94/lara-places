@@ -1,0 +1,12 @@
+{
+  "index_patterns": ["places*"],
+  "template": {
+    "mappings": {
+      "properties": {
+        "location": { "type": "geo_point" },
+        "tags": { "type": "object" }
+      }
+    }
+  }
+}
+

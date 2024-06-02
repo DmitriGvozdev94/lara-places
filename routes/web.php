@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IgnoreListController;
 use Inertia\Inertia;
 
+Route::get('/ignore-list', [IgnoreListController::class, 'index'])->name('ignore-list');
+
+Route::middleware('auth:sanctum')->delete('/ignore-list/{itemId}', [IgnoreListController::class, 'destroy'])->name('ignore-list.destroy');
 
 Route::middleware('auth:sanctum')->post('/ignore-list', [IgnoreListController::class, 'store']);
 

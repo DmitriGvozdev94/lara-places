@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export default function useFetchNearbyLocations(latitude, longitude, radius, tags = [], size = 10) {
+export default function useFetchNearbyLocations(latitude, longitude, radius, tags = [], size = 10, refreshTag = 0) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -35,7 +35,7 @@ export default function useFetchNearbyLocations(latitude, longitude, radius, tag
         }
 
         fetchData();
-    }, [latitude, longitude, radius, tags, size]);
+    }, [latitude, longitude, radius, tags, size, refreshTag]);
 
     return { data, loading, error };
 }

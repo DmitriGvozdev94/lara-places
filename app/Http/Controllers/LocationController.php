@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use App\Models\IgnoreList;
+use Illuminate\Support\Facades\Auth;
+
 
 class LocationController extends Controller
 {
@@ -117,6 +120,7 @@ class LocationController extends Controller
     {
         try {
             $client = new Client();
+            $ignoreList = IgnoreList::where('user_id', Auth::id())->pluck('item_id')->toArray();
 
             $query = [
                 'bool' => [
@@ -128,6 +132,13 @@ class LocationController extends Controller
                                     'lat' => $latitude,
                                     'lon' => $longitude,
                                 ],
+                            ],
+                        ],
+                    ],
+                    'must_not' => [
+                        [
+                            'terms' => [
+                                'id' => $ignoreList,
                             ],
                         ],
                     ],

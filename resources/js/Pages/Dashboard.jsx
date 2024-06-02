@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import BlockIcon from '@mui/icons-material/Block';
 
 async function addToIgnore(itemId) {
+    console.log("Ignoring Item: ", itemId)
     try {
         const response = await axios.post('/ignore-list', {
             item_id: itemId,
@@ -16,8 +17,6 @@ async function addToIgnore(itemId) {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
             }});
-            data = response.data
-            return data
         } 
     catch (error) {
         console.error('Error ignoring item:', error);
@@ -26,13 +25,14 @@ async function addToIgnore(itemId) {
 } 
 
 export default function Dashboard({ auth }) {
-    const [latitude, setLatitude] = useState(45.42121997393463);
+    const [latitude, setLatitude] = useState(45.42121997393463); // Default Location BNK
     const [longitude, setLongitude] = useState(-75.70225556954014);
     const [radius, setRadius] = useState(1000); // Default radius in meters
     const [numResults, setNumResults] = useState(11);
     const [tags, setTags] = useState([]); // Default filter is empty
+    const [refreshTag, setRefreshTag] = useState(0);
 
-    const { data, loading, error } = useFetchNearbyLocations(latitude, longitude, radius, tags, numResults);
+    const { data, loading, error } = useFetchNearbyLocations(latitude, longitude, radius, tags, numResults, refreshTag);
 
 
 
@@ -41,6 +41,7 @@ export default function Dashboard({ auth }) {
         console.log(row)
         addToIgnore(row.id).then((res) => {
             console.log(res)
+            setRefreshTag(prevKey => prevKey + 1); // Trigger re-fetch
         }).catch((err) => {
             console.log(err)
         })
