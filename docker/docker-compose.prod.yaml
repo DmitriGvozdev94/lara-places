@@ -3,7 +3,7 @@
 version: '3.8'
 services:
   app:
-    image: laraplaces
+    image: 315501325515.dkr.ecr.ca-central-1.amazonaws.com/lara-places:latest
     container_name: laravel_breeze_app
     restart: unless-stopped
     volumes:
